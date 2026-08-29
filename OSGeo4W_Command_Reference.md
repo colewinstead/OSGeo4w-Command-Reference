@@ -4,6 +4,39 @@ Practical Windows command-line recipes for inspecting, converting, georeferencin
 
 > **Safety rule:** Keep the source imagery unchanged. Write to a new output file unless you intentionally use an in-place metadata editor. After every important operation, inspect the output with `gdalinfo` before attaching it in CAD.
 
+## Contents
+
+- [My Most Used OSGeo4W Commands](#my-most-used-osgeo4w-commands)
+  - [Inspect an aerial TIFF](#inspect-an-aerial-tiff)
+  - [Convert a COG or other TIFF](#convert-a-cog-or-other-tiff-to-a-standard-geotiff)
+  - [Reproject an aerial](#reproject-an-aerial-into-the-project-crs)
+  - [Assign a CRS without moving pixels](#assign-a-crs-without-moving-pixels)
+  - [Physically merge aerial TIFFs](#physically-merge-adjacent-aerial-tiffs)
+  - [Build a VRT](#build-a-vrt-instead-of-physically-merging)
+  - [Set or change NoData](#set-or-change-nodata)
+  - [Remove a black aerial collar](#remove-a-black-aerial-collar-with-transparency)
+  - [Build external overviews](#build-external-overviews-for-faster-display)
+  - [Create a world file](#create-a-world-file-with-a-new-tiff)
+  - [Clip an aerial](#clip-an-aerial-to-a-project-boundary)
+  - [Threading settings](#turn-on-useful-threading-for-the-current-shell)
+- [Choosing the Right Raster Output](#choosing-the-right-raster-output)
+- [Starting the correct shell](#1-starting-the-correct-shell)
+- [Command map](#2-command-map)
+- [Inspecting raster files and coordinate systems](#3-inspect-rasters-and-coordinate-systems)
+- [Converting and translating TIFFs](#4-convert-copy-resize-and-compress-rasters)
+- [Assigning or editing georeferencing metadata](#5-edit-georeferencing-metadata)
+- [Building overviews (`.ovr`)](#6-build-overviews-for-faster-display)
+- [Reprojecting, resampling, and clipping](#7-reproject-resample-and-clip-rasters)
+- [Physical mosaics and VRTs](#8-physical-mosaics-and-vrts)
+- [DEM and terrain tools](#9-dem-and-terrain-tools)
+- [Raster math and classification](#10-raster-math-and-classification)
+- [OGR and vector commands](#11-vector-inspection-and-conversion)
+- [PROJ and coordinate transformation commands](#proj-and-coordinate-transformation-commands)
+- [Other GDAL and OSGeo4W utilities](#12-other-useful-utilities)
+- [Common civil workflow recipes](#13-common-civil-workflow-recipes)
+- [Troubleshooting and less-frequent reference material](#14-troubleshooting)
+- [Official documentation](#15-official-documentation)
+
 ## My Most Used OSGeo4W Commands
 
 These are the everyday copy/paste commands. Replace the obvious placeholders before running them:
@@ -112,6 +145,12 @@ gdal_merge.py -o "C:\Path\Merged.tif" -of GTiff -co TILED=YES -co BLOCKXSIZE=256
 ```
 
 Depending on the installation, the launcher may be `gdal_merge`, `gdal_merge.py`, or `gdal_merge.bat`.
+
+If the suffix-free wrapper is installed, the same operation begins like this:
+
+```bat
+gdal_merge -o "C:\Path\Merged.tif" -of GTiff -co TILED=YES -co COMPRESS=DEFLATE -co BIGTIFF=IF_SAFER "C:\Path\Tile1.tif" "C:\Path\Tile2.tif"
+```
 
 **Watch out for:** Inputs should already have compatible CRS, band layout, resolution, and data type. A physical merge can become enormous. `gdal_merge` does not perform a true reprojection; use `gdalwarp` to align incompatible inputs first. `BIGTIFF=YES` avoids the Classic TIFF 4 GiB limit but may reduce compatibility with older V8i builds.
 
@@ -294,27 +333,6 @@ Internal GeoTIFF georeferencing is often sufficient, so a `.tfw` is not always r
 8. Enable `GDAL_NUM_THREADS`, warp threads, and compression threads where the specific command/codec supports them.
 9. Avoid unnecessary uncompressed intermediate TIFFs; a VRT can often serve as the intermediate.
 10. Keep enough free space for temporary files and the final raster.
-
-## Contents
-
-- [My Most Used OSGeo4W Commands](#my-most-used-osgeo4w-commands)
-- [Choosing the Right Raster Output](#choosing-the-right-raster-output)
-- [Starting the correct shell](#1-starting-the-correct-shell)
-- [Command map](#2-command-map)
-- [Inspecting raster files and coordinate systems](#3-inspect-rasters-and-coordinate-systems)
-- [Converting and translating TIFFs](#4-convert-copy-resize-and-compress-rasters)
-- [Assigning or editing georeferencing metadata](#5-edit-georeferencing-metadata)
-- [Building overviews (`.ovr`)](#6-build-overviews-for-faster-display)
-- [Reprojecting, resampling, and clipping](#7-reproject-resample-and-clip-rasters)
-- [Physical mosaics and VRTs](#8-physical-mosaics-and-vrts)
-- [DEM and terrain tools](#9-dem-and-terrain-tools)
-- [Raster math and classification](#10-raster-math-and-classification)
-- [OGR and vector commands](#11-vector-inspection-and-conversion)
-- [PROJ and coordinate transformation commands](#proj-and-coordinate-transformation-commands)
-- [Other GDAL and OSGeo4W utilities](#12-other-useful-utilities)
-- [Common civil workflow recipes](#13-common-civil-workflow-recipes)
-- [Troubleshooting and less-frequent reference material](#14-troubleshooting)
-- [Official documentation](#15-official-documentation)
 
 ## 1. Starting the correct shell
 
